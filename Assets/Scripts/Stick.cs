@@ -8,11 +8,10 @@ namespace Golf
 {
     public class Stick : MonoBehaviour
     {
-
-        public UnityEvent<Collider> onCollision;
+	    // unity event doesn't work correctly due to caching arg bug !
         private void OnCollisionEnter(Collision collision)
         {
-            onCollision.Invoke(collision.collider);
+            GameEvents.CollisionStick(collision.collider);
         }
     }
 }

@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 
 namespace Golf
@@ -19,10 +21,9 @@ namespace Golf
         {
             m_lastPosition = helper.position;
 
-            m_isDown = Input.GetMouseButton(0);
+            //m_isDown = Input.GetMouseButton(0);
 
             Quaternion rot = stick.localRotation;
-
             Quaternion toRot = Quaternion.Euler(0, 0, m_isDown ? range : -range);
 
             rot = Quaternion.RotateTowards(rot, toRot, speed * Time.deltaTime);
@@ -34,21 +35,38 @@ namespace Golf
             m_isDown=value;
         }
 
-        public void OnCollisionStick(Collider collider)
+        private void Start()
         {
-            if (collider.TryGetComponent<Rigidbody>(out Rigidbody body))
-            {
-                //var dir = m_isDown ? stick.right : -stick.right;
-                var dir = (helper.position - m_lastPosition).normalized;
-                body.AddForce(dir * power, ForceMode.Impulse);
-                if (collider.TryGetComponent(out Stone stone) && !stone.isAffect)
-                { 
-                    stone.isAffect = true;
-                    GameEvents.StickHit();
-                }
-            }
+	        GameEvents.onCollisionStick += OnCollisionStick;
+	        GameEvents.OnStateEnter += GameEventsOnOnStateEnter;
+        }
 
-            //Debug.Log(collider, this);
+        private void GameEventsOnOnStateEnter(GameState state)
+        {
+	        if (state is GamePlayState)
+	        {
+		        m_isDown = false;
+	        }
+        }
+
+        private void OnDestroy()
+        {
+	        GameEvents.onCollisionStick -= OnCollisionStick;
+        }
+
+        private void OnCollisionStick(Collider collider)
+        {
+	        if (collider.TryGetComponent(out Rigidbody body))
+	        {
+		        //var dir = m_isDown ? stick.right : -stick.right;
+		        var dir = (helper.position - m_lastPosition).normalized;
+		        body.AddForce(dir * power, ForceMode.Impulse);
+		        if (collider.TryGetComponent(out Stone stone) && !stone.isAffect)
+		        {
+			        stone.isAffect = true;
+			        GameEvents.StickHit();
+		        }
+	        }
         }
     }
 

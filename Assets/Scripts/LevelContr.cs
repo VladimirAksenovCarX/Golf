@@ -25,8 +25,11 @@ namespace Golf
         public void ClearStone()
         {
             foreach (var stone in m_stones)
-            { 
-                Destroy(stone);
+            {
+	            if (stone != null)
+	            {
+		            Destroy(stone);
+	            }
             }
             m_stones.Clear();
         }

@@ -23,6 +23,7 @@ namespace Golf
             {
                 item.SetActive(true);
             }
+            GameEvents.EnterState(this);
         }
 
         protected virtual void OnDisable()
@@ -34,6 +35,7 @@ namespace Golf
                     item.SetActive(false);
                 }
             }
+            GameEvents.ExitState(this);
         }
     }
 }
